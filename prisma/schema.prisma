@@ -9,3 +9,42 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Client {
+  id        String      @id @default(uuid())
+  name      String
+  Container Container[]
+}
+
+model Container {
+  id                String              @id @default(uuid())
+  client            Client              @relation(fields: [clientId], references: [id])
+  clientId          String
+  container         String              @unique
+  type              Int
+  status            ContainerStatus
+  ContainerHandling ContainerHandling[]
+}
+
+model ContainerHandling {
+  id          String                @id @default(uuid())
+  container   Container             @relation(fields: [containerId], references: [id])
+  containerId String
+  type        ContainerHandlingType
+  startedAt   DateTime
+  finishedAt  DateTime
+}
+
+enum ContainerStatus {
+  EMPTY
+  STUFFED
+}
+
+enum ContainerHandlingType {
+  GATE_IN
+  GATE_OUT
+  WEIGHING
+  LOADING
+  UNLOADING
+  REPOSITIONING
+}
