@@ -1,0 +1,1 @@
+export { ICustomResponse } from './ICustomResponse';
