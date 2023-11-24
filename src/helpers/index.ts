@@ -1,1 +1,1 @@
-export { HttpResponse } from './http-response';
+export { Http } from './http-response';

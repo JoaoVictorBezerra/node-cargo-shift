@@ -2,8 +2,8 @@ import { Request } from 'express';
 import { CreateClientRequest } from '../entities';
 import { ClientService } from '../services';
 import { BusinessException } from '../exceptions';
-import { Http } from '../helpers/http-response';
 import { HttpStatusCode } from '../constants';
+import { Http } from '../helpers';
 
 export class ClientController {
   protected clientService: ClientService;
