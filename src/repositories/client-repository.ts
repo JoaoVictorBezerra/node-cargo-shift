@@ -39,13 +39,13 @@ export class ClientRepository {
     });
   }
 
-  async update(id: string, client: CreateClientRequest) {
+  async update(id: string, name: string) {
     return await prismaClient.client.update({
       where: {
         id: id,
       },
       data: {
-        name: client.name,
+        name: name,
       },
     });
   }
