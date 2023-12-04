@@ -1,63 +1,23 @@
-import express from 'express';
+import express, { Express, Request, Response } from 'express';
 import * as dotenv from 'dotenv';
 
-import { Router, Request, Response } from 'express';
-import { ICustomResponse } from './@types';
-import { ClinetController as ClientController } from './controller';
+import { router } from './routes';
 
 dotenv.config();
-const app = express();
 
-const route = Router();
+const app: Express = express();
 
 app.use(express.json());
 
-route.get('/', (req: Request, res: Response) => {
-  res.json({ message: 'hello world with Typescript' });
+app.use((req: Request, res: Response, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Header', '*');
+  res.header('Access-Control-Allow-Methods', '*');
+  next();
 });
 
-route.post('/api/client', async (req: Request, res: Response) => {
-  const clientControllerInstance = new ClientController();
+app.use('/api', router);
 
-  const response: ICustomResponse = await clientControllerInstance.create(req);
-
-  res.status(response.statusCode).json(response.body);
+app.listen(process.env.PORT, () => {
+  console.log(`Server running on http://localhost:${process.env.PORT}`);
 });
-
-route.get('/api/client', async (req: Request, res: Response) => {
-  const clientControllerInstance = new ClientController();
-
-  const response: ICustomResponse = await clientControllerInstance.getAll();
-
-  res.status(response.statusCode).json(response.body);
-});
-
-route.get('/api/client/:id', async (req: Request, res: Response) => {
-  const clientControllerInstance = new ClientController();
-
-  const response: ICustomResponse = await clientControllerInstance.getById(req);
-
-  res.status(response.statusCode).json(response.body);
-});
-
-route.delete('/api/client/:id', async (req: Request, res: Response) => {
-  const clientControllerInstance = new ClientController();
-
-  const response: ICustomResponse = await clientControllerInstance.delete(req);
-
-  res.status(response.statusCode).json(response.body);
-});
-
-route.put('/api/client/:id', async (req: Request, res: Response) => {
-  const clientControllerInstance = new ClientController();
-
-  const response: ICustomResponse = await clientControllerInstance.update(req);
-
-  res.status(response.statusCode).json(response.body);
-});
-
-app.use(route);
-app.listen(
-  process.env.PORT,
-  () => `server running on port ${process.env.PORT}`,
-);
