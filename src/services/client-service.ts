@@ -6,8 +6,8 @@ import { BusinessException } from '../exceptions';
 export class ClientService {
   protected clientRepository: ClientRepository;
 
-  constructor() {
-    this.clientRepository = new ClientRepository();
+  constructor(clientRepository: ClientRepository) {
+    this.clientRepository = clientRepository;
   }
 
   async create(name: string) {

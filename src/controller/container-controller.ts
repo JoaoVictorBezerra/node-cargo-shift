@@ -7,8 +7,8 @@ import { BusinessException } from '../exceptions';
 export class ContainerController {
   protected containerService: ContainerService;
 
-  constructor() {
-    this.containerService = new ContainerService();
+  constructor(containerService: ContainerService) {
+    this.containerService = containerService;
   }
 
   async create(req: Request, res: Response) {

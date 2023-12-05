@@ -8,8 +8,8 @@ import { HttpStatusCode } from '../constants';
 export class ContainerService {
   protected containerRepository: ContainerRepository;
 
-  constructor() {
-    this.containerRepository = new ContainerRepository();
+  constructor(containerRepository: ContainerRepository) {
+    this.containerRepository = containerRepository;
   }
 
   async create(createContainerRequest: CreateContainerRequest) {

@@ -7,8 +7,8 @@ import { Request, Response } from 'express';
 export class ClientController {
   protected clientService: ClientService;
 
-  constructor() {
-    this.clientService = new ClientService();
+  constructor(clientService: ClientService) {
+    this.clientService = clientService;
   }
 
   async create(req: Request, res: Response) {

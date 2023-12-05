@@ -1,8 +1,14 @@
+import { ClientRepository } from './../repositories/client-repository';
 import { Router } from 'express';
 import { ClientController } from '../controller/client-controller';
 import { Request, Response } from 'express';
+import { ClientService } from '../services';
 
-const clientController = new ClientController();
+// Príncipio Factory
+const clientRepository = new ClientRepository();
+const clientService = new ClientService(clientRepository);
+const clientController = new ClientController(clientService);
+
 const clientRouter = Router();
 
 clientRouter

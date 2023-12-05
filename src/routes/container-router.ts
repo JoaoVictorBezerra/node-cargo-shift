@@ -1,8 +1,13 @@
+import { ContainerService } from './../services/container-service';
+import { ContainerRepository } from './../repositories/container-repository';
 import { Router } from 'express';
 import { ContainerController } from './../controller/container-controller';
 import { Request, Response } from 'express';
 
-const containerController = new ContainerController();
+const containerRepository = new ContainerRepository();
+const containerService = new ContainerService(containerRepository);
+const containerController = new ContainerController(containerService);
+
 const containerRouter = Router();
 
 containerRouter
