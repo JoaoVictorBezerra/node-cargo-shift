@@ -26,6 +26,14 @@ model Container {
   ContainerHandling ContainerHandling[]
 }
 
+model User {
+  id       String   @id @default(uuid())
+  name     String
+  email    String   @unique
+  password String
+  role     UserRole @default(USER)
+}
+
 model ContainerHandling {
   id          String                @id @default(uuid())
   container   Container             @relation(fields: [containerId], references: [id])
@@ -47,4 +55,9 @@ enum ContainerHandlingType {
   LOADING
   UNLOADING
   REPOSITIONING
+}
+
+enum UserRole {
+  ADMIN
+  USER
 }
