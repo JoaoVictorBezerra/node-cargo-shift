@@ -3,6 +3,14 @@ import { ClientService } from '../services';
 import { BusinessException } from '../exceptions';
 import { HttpStatusCode } from '../constants';
 import { Request, Response } from 'express';
+import { ZodError } from 'zod';
+
+import {
+  CreateClientSchema,
+  UpdateClientSchema,
+  uuidSchema,
+  verifyExtraFields,
+} from '../helpers';
 
 export class ClientController {
   protected clientService: ClientService;
@@ -12,32 +20,28 @@ export class ClientController {
   }
 
   async create(req: Request, res: Response) {
-    const body: CreateClientRequest = req.body;
+    try {
+      const body: CreateClientRequest = req.body;
+      const createClientSchema = CreateClientSchema();
+      const extraFields = verifyExtraFields(body, createClientSchema);
 
-    const requiredFields: Array<keyof CreateClientRequest> = ['name'];
-
-    for (const field of requiredFields) {
-      if (!body[field]) {
+      if (extraFields.length > 0) {
         return res.status(HttpStatusCode.BAD_REQUEST).json({
-          error: `${field} is required`,
+          error: `Extra fields: ${extraFields.join(', ')}`,
         });
       }
-    }
 
-    const invalidFields = Object.keys(body).filter(
-      (field) => !requiredFields.includes(field as keyof CreateClientRequest),
-    );
+      await createClientSchema.parseAsync(body);
 
-    if (invalidFields.length > 0) {
-      return res.status(HttpStatusCode.BAD_REQUEST).json({
-        error: `Invalid field(s): ${invalidFields.join(', ')}`,
-      });
-    }
-
-    try {
       const createdClient = await this.clientService.create(body.name);
+
       return res.status(HttpStatusCode.CREATED).json(createdClient);
     } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(HttpStatusCode.BAD_REQUEST).json({
+          error: error.errors[0].message,
+        });
+      }
       if (error instanceof BusinessException) {
         return res.status(error.statusCode).json({ error: error.message });
       } else {
@@ -49,16 +53,19 @@ export class ClientController {
   }
 
   async getById(req: Request, res: Response) {
-    const id = req.params.id;
-    const client = await this.clientService.findById(id);
-
-    if (!client) {
-      return res.status(HttpStatusCode.NOT_FOUND).json({
-        error: 'Client not found',
-      });
-    }
-
     try {
+      const id = req.params.id;
+      const getByIdSchema = uuidSchema();
+
+      await getByIdSchema.parseAsync({ id });
+
+      const client = await this.clientService.findById(id);
+
+      if (!client) {
+        return res.status(HttpStatusCode.NOT_FOUND).json({
+          error: 'Client not found',
+        });
+      }
       return res.status(HttpStatusCode.OK).json(client);
     } catch (error) {
       if (error instanceof BusinessException) {
@@ -90,6 +97,10 @@ export class ClientController {
   async delete(req: Request, res: Response) {
     try {
       const id = req.params.id;
+      const deleteSchema = uuidSchema();
+
+      await deleteSchema.parseAsync({ id });
+
       const client = await this.clientService.findById(id);
 
       if (!client) {
@@ -117,15 +128,19 @@ export class ClientController {
       const id = req.params.id;
       const body: CreateClientRequest = req.body;
 
-      const requiredFields: Array<keyof CreateClientRequest> = ['name'];
+      const updateSchema = UpdateClientSchema();
+      const verifyUuid = uuidSchema();
 
-      for (const field of requiredFields) {
-        if (!body[field]) {
-          return res.status(HttpStatusCode.BAD_REQUEST).json({
-            error: `${field} is required`,
-          });
-        }
+      const extraFields = verifyExtraFields(body, updateSchema);
+
+      if (extraFields.length > 0) {
+        return res.status(HttpStatusCode.BAD_REQUEST).json({
+          error: `Extra fields: ${extraFields.join(', ')}`,
+        });
       }
+
+      await verifyUuid.parseAsync({ id });
+      await updateSchema.parseAsync({ body });
 
       const updatedClient = await this.clientService.update(id, body.name);
 
