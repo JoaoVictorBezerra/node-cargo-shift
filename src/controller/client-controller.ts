@@ -16,6 +16,8 @@ import {
   UpdateClientRequestDTO,
 } from '../entities/client';
 
+import { Client } from '@prisma/client';
+
 export class ClientController {
   protected clientService: ClientService;
 
@@ -27,7 +29,7 @@ export class ClientController {
     try {
       const body: CreateClientRequestDTO = req.body;
       const createClientSchema = CreateClientSchema();
-      const extraFields = verifyExtraFields(body, createClientSchema);
+      const extraFields: string[] = verifyExtraFields(body, createClientSchema);
 
       if (extraFields.length > 0) {
         return res.status(HttpStatusCode.BAD_REQUEST).json({
@@ -37,7 +39,7 @@ export class ClientController {
 
       await createClientSchema.parseAsync(body);
 
-      const createdClient = await this.clientService.create(body.name);
+      const createdClient: Client = await this.clientService.create(body.name);
 
       return res.status(HttpStatusCode.CREATED).json(createdClient);
     } catch (error) {
@@ -58,12 +60,12 @@ export class ClientController {
 
   async getById(req: Request, res: Response) {
     try {
-      const id = req.params.id;
+      const id: string = req.params.id;
       const getByIdSchema = uuidSchema();
 
       await getByIdSchema.parseAsync({ id });
 
-      const client = await this.clientService.findById(id);
+      const client: Client | null = await this.clientService.findById(id);
 
       if (!client) {
         return res.status(HttpStatusCode.NOT_FOUND).json({
@@ -84,7 +86,7 @@ export class ClientController {
 
   async getAll(req: Request, res: Response) {
     try {
-      const clients = await this.clientService.findAll();
+      const clients: Client[] = await this.clientService.findAll();
 
       return res.status(HttpStatusCode.OK).json(clients);
     } catch (error) {
@@ -100,12 +102,12 @@ export class ClientController {
 
   async delete(req: Request, res: Response) {
     try {
-      const id = req.params.id;
+      const id: string = req.params.id;
       const deleteSchema = uuidSchema();
 
       await deleteSchema.parseAsync({ id });
 
-      const client = await this.clientService.findById(id);
+      const client: Client | null = await this.clientService.findById(id);
 
       if (!client) {
         return res.status(HttpStatusCode.NOT_FOUND).json({
@@ -129,13 +131,13 @@ export class ClientController {
 
   async update(req: Request, res: Response) {
     try {
-      const id = req.params.id;
+      const id: string = req.params.id;
       const body: UpdateClientRequestDTO = req.body;
 
       const updateSchema = UpdateClientSchema();
       const verifyUuid = uuidSchema();
 
-      const extraFields = verifyExtraFields(body, updateSchema);
+      const extraFields: string[] = verifyExtraFields(body, updateSchema);
 
       if (extraFields.length > 0) {
         return res.status(HttpStatusCode.BAD_REQUEST).json({
@@ -146,7 +148,10 @@ export class ClientController {
       await verifyUuid.parseAsync({ id });
       await updateSchema.parseAsync({ body });
 
-      const updatedClient = await this.clientService.update(id, body.name);
+      const updatedClient: Client = await this.clientService.update(
+        id,
+        body.name,
+      );
 
       return res.status(HttpStatusCode.OK).json(updatedClient);
     } catch (error) {
