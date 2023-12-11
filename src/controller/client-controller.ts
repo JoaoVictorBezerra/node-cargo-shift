@@ -1,4 +1,3 @@
-import { CreateClientRequest } from '../entities';
 import { ClientService } from '../services';
 import { BusinessException } from '../exceptions';
 import { HttpStatusCode } from '../constants';
@@ -12,6 +11,11 @@ import {
   verifyExtraFields,
 } from '../helpers';
 
+import {
+  CreateClientRequestDTO,
+  UpdateClientRequestDTO,
+} from '../entities/client';
+
 export class ClientController {
   protected clientService: ClientService;
 
@@ -21,7 +25,7 @@ export class ClientController {
 
   async create(req: Request, res: Response) {
     try {
-      const body: CreateClientRequest = req.body;
+      const body: CreateClientRequestDTO = req.body;
       const createClientSchema = CreateClientSchema();
       const extraFields = verifyExtraFields(body, createClientSchema);
 
@@ -126,7 +130,7 @@ export class ClientController {
   async update(req: Request, res: Response) {
     try {
       const id = req.params.id;
-      const body: CreateClientRequest = req.body;
+      const body: UpdateClientRequestDTO = req.body;
 
       const updateSchema = UpdateClientSchema();
       const verifyUuid = uuidSchema();

@@ -1,3 +1,9 @@
-import { Client } from '@prisma/client';
+interface CreateClientRequestDTO {
+  name: string;
+}
 
-export interface CreateClientRequest extends Client {}
+interface UpdateClientRequestDTO {
+  name: string;
+}
+
+export { CreateClientRequestDTO, UpdateClientRequestDTO };
