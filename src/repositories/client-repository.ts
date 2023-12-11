@@ -1,4 +1,4 @@
-import { CreateClientRequest } from '../entities';
+import { Client } from '@prisma/client';
 import { prismaClient } from '../lib/prisma';
 
 export class ClientRepository {
@@ -22,7 +22,7 @@ export class ClientRepository {
     return await prismaClient.client.findMany();
   }
 
-  async create(client: CreateClientRequest) {
+  async create(client: Client) {
     return await prismaClient.client.create({
       data: {
         name: client.name,
