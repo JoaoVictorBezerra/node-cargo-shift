@@ -29,7 +29,6 @@ export class ClientService {
   }
 
   async findByName(name: string) {
-    console.log(name);
     return await this.clientRepository.findByName(name);
   }
 
